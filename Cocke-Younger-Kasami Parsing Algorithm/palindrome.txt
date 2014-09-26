@@ -1,0 +1,6 @@
+A -> NO|PQ|NN|PP|a|b
+N -> a
+O -> XN
+P -> b
+Q -> XP
+X -> NO|PQ|NN|PP|a|b

@@ -4,44 +4,51 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Scanner;
 
 public class salo_cyk {
-	static HashMap<Character, ArrayList<String>> cfg;
-	static String command;
-	static int N; // command length
-	static ArrayList<ArrayList<HashSet<Character>>> T = 
-			new ArrayList<ArrayList<HashSet<Character>>>(); // table for cyk																										
-	static ArrayList<String> inputStrings; // to read cfg file
+	public static HashMap<Character, ArrayList<String>> cfg;
+	public static String command;
+	public static int N; // command length
+	public static char START_SYM;
+	public static ArrayList<ArrayList<HashSet<Character>>> T = new ArrayList<ArrayList<HashSet<Character>>>(); // table
+																												// for
+																												// cyk
+	public static ArrayList<String> inputStrings; // to read cfg file
 
 	public static void main(String[] args) throws FileNotFoundException {
-		readCFGdesc(args[0]);
-		initCFG();
-		readCommand();
-		
-		if (!command.isEmpty()) {
-			simulateCFG();
-			acceptReject();
-		} else
-			System.out.println("reject");
-		// System.out.println(cfg); printT();
+		try {
+			readCFGdesc(args[0]);
+			//readCFGdesc(null);
+			initCFG();
+			readCommand();
+			if (!command.isEmpty()) {
+				simulateCFG();
+				acceptReject();
+			} else
+				System.out.println("[reject]");
+		} catch(Exception e){}
+		finally {}
 	}
 
-	static void readCommand(){
+	static void readCommand() {
 		Scanner sc = new Scanner(System.in);
 		if (sc.hasNext())
 			command = sc.next();
 		else
 			command = "";
 		sc.close();
-		//command = "aacbb"; //test
+		//command = "abba"; //test
 		N = command.length();
 	}
-	
+
 	static void readCFGdesc(String arg) throws FileNotFoundException {
-		//read input
-		Scanner sc = new Scanner(new BufferedReader(new	FileReader(arg)));
-		//Scanner sc = new Scanner(new BufferedReader(new FileReader("in.txt")));
+		// read input
+		Scanner sc = new Scanner(new BufferedReader(new FileReader(arg)));
+		//Scanner sc = new Scanner(new BufferedReader(new
+		// FileReader("in.txt")));
 		inputStrings = new ArrayList<String>();
 		while (sc.hasNext())
 			inputStrings.add(sc.nextLine());
@@ -49,6 +56,9 @@ public class salo_cyk {
 	}
 
 	static void initCFG() {
+		Scanner scanner = new Scanner(inputStrings.get(0));
+		START_SYM = scanner.next().charAt(0);
+		scanner.close();
 		cfg = new HashMap<Character, ArrayList<String>>();
 		for (String s : inputStrings) {
 			Scanner sc = new Scanner(s);
@@ -89,6 +99,7 @@ public class salo_cyk {
 		return (crossProd);
 	}
 
+	@SuppressWarnings("rawtypes")
 	static void simulateCFG() {
 		HashSet<String> candidates;
 		for (int i = 0; i < N; i++) {
@@ -101,13 +112,17 @@ public class salo_cyk {
 					candidates = genCandidates(i, j);
 
 				HashSet<Character> fromset = new HashSet<Character>();
-				for (HashMap.Entry<Character, ArrayList<String>> entry : cfg
-						.entrySet())
+				Iterator iterator = cfg.entrySet().iterator();
+				while (iterator.hasNext()) {
+					@SuppressWarnings({ "unchecked" })
+					Map.Entry<Character, ArrayList<String>> entry = (Map.Entry) iterator
+							.next();
 					for (String s : candidates)
 						if (entry.getValue().contains(s))
 							fromset.add(entry.getKey());
 
-				row.add(j, fromset);
+					row.add(j, fromset);
+				}
 			}
 			T.add(i, row);
 		}
@@ -115,9 +130,9 @@ public class salo_cyk {
 
 	static void acceptReject() {
 		// if has "S" at the top - then accept!
-		if (T.get(T.size() - 1).get(0).contains("S".charAt(0)))
-			System.out.println("accept");
+		if (T.get(T.size() - 1).get(0).contains(START_SYM))
+			System.out.println("[accept]");
 		else
-			System.out.println("reject");
+			System.out.println("[reject]");
 	}
 }
