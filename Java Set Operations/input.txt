@@ -1,7 +1,0 @@
-3
-apple pear
-house
-5
-house
-dog frog cat
-house

@@ -1,3 +1,0 @@
-trans 0 a 1
-trans 0 b 1
-final 1
